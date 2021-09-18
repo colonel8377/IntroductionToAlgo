@@ -6,145 +6,59 @@ import java.util.List;
 
 public class UpperEnvelope {
     public static void main(String[] args) {
-        int[] A = {1,2,3,4,5,6,7,8};
-        int[] B = {1,2,3,4,5,6,7,8};
-        double res = new UpperEnvelope().solution(A, B);
-        System.out.println(res);
-    }
-    private enum EnvelopeKind {
-        Upper,
-        Lower
-    }
-    int _leftBorder = -10000000;
-    int _rightBorder = 10000000;
-    public double solution(int[] A, int[] B) {
-        //This is where result will be stored
-        double result = Double.MAX_VALUE;
-
-        //Sanity check
-        if (A != null && A.length > 0 && B != null && B.length > 0)
-        {
-            int N = A.length;
-
-            //We will treat every A[K]*X+B as linear function
-            LinearFunction[] functions = new LinearFunction[N];
-            for (int i = 0; i < N; i++){
-                functions[i] = new LinearFunction(A[i], B[i]);
-            }
-            //We sort the functions by slope and intercept
-            Arrays.sort(functions);
-            for(int i = 0; i < functions.length; i++){
-                System.out.println(functions[i]);
-            }
-            //We get the upper and lower envelopes for the functions collection
-            Envelope upperEnvelope = getEnvelope(functions, EnvelopeKind.Upper);
-            System.out.println(upperEnvelope);
-            Envelope lowerEnvelope = getEnvelope(functions, EnvelopeKind.Lower);
-
-            int upperEnvelopePointIndex = 1;
-            int lowerEnvelopePointIndex = 1;
-
-            //We need to minimaze the distance between envelopes, we will start by going through upper envelope
-            while (upperEnvelopePointIndex < upperEnvelope.getIntersections().length)
-            {
-                double distance = Double.MAX_VALUE;
-
-                //If current intersection in upper envelope lies before the current intersection in lower envelope (or there are no more intersections in lower envelope)
-                if (upperEnvelope.getIntersections()[upperEnvelopePointIndex].getX() < lowerEnvelope.getIntersections()[lowerEnvelopePointIndex].getX() || lowerEnvelopePointIndex == lowerEnvelope.getIntersections().length - 1)
-                {
-                    //The distance is equal to value at current intersection from upper envelope minus the value of current function from lower envelope in this point
-                    distance = upperEnvelope.getIntersections()[upperEnvelopePointIndex].getY() - lowerEnvelope.getLines()[lowerEnvelopePointIndex - 1].Evaluate(upperEnvelope.getIntersections()[upperEnvelopePointIndex].getX());
-                    //We move to next intersection in upper envelope
-                    upperEnvelopePointIndex++;
-                }
-                //Otherwise (the current intersection in upper envelope lies further than current intersection in lower envelope and there are still other intersection in lower envelope)
-                else
-                {
-                    //The distance is equal to the value of current function from upper envelope in this point minus value at current intersection from lower envelope
-                    distance = upperEnvelope.getLines()[upperEnvelopePointIndex - 1].Evaluate(lowerEnvelope.getIntersections()[lowerEnvelopePointIndex].getX()) - lowerEnvelope.getIntersections()[lowerEnvelopePointIndex].getY();
-
-                    //We move to next intersection in lower envelope
-                    lowerEnvelopePointIndex++;
-                }
-
-                //If new distance is smaller than result which we laready have
-                if (distance < result)
-                    //We update the result
-                    result = distance;
-            }
+        double[] A = {1,2,8,4,-1,-2,-1,2};
+        double[] B = {1,4,-1,-6,10,16,20,2};
+        List points = new ArrayList<CartesianCoordinates>();
+        for(int i = 0; i < A.length; i++){
+            points.add(new CartesianCoordinates(A[i], -B[i]));
         }
-        return result;
-    }
-    public Envelope getEnvelope(LinearFunction[] functions, EnvelopeKind kind)
-    {
-        Envelope envelope = null;
-
-        if (functions != null && functions.length > 0)
-        {
-            int firstFunctionIndex, lastFunctionIndex, functionsIterationStep;
-            //While looking for upper envelope we will go from first to last function
-            if (kind == EnvelopeKind.Upper)
-            {
-                firstFunctionIndex = 0;
-                lastFunctionIndex = functions.length - 1;
-                functionsIterationStep = 1;
-            }
-            //While looking for lower envelope we will go from last to first function
-            else
-            {
-                firstFunctionIndex = functions.length - 1;
-                lastFunctionIndex = 0;
-                functionsIterationStep = -1;
-            }
-
-            List<LinearFunction> lines = new ArrayList<>();
-            List<CartesianCoordinates> points = new ArrayList<>();
-
-            //We set the first line in the envelope
-            LinearFunction previousLine = functions[firstFunctionIndex];
-            lines.add(previousLine);
-
-            //And calculate "theoretical" furthest to left point
-            points.add(new CartesianCoordinates(_leftBorder, previousLine.Evaluate(_leftBorder)));
-
-            //We will look for intersection points between the functions
-            for (int i = firstFunctionIndex + functionsIterationStep; (kind == EnvelopeKind.Upper && i <= lastFunctionIndex) || (kind == EnvelopeKind.Lower && i >= lastFunctionIndex); i += functionsIterationStep)
-            {
-                LinearFunction currentLine = functions[i];
-                //Because we have taken intercept into consideration while sorting we can skip parallel lines
-                if (currentLine.getSlope() != previousLine.getSlope())
-                {
-                    //We add an intersection between previous and current line to the points collection
-                    points.add(previousLine.Intersect(currentLine));
-
-                    //If the latest intersection point lies before any of the previous one, we need to update those intersections to find the actual last intersection
-                    int lastIntersectionIndex = points.size() - 1;
-                    while (points.get(lastIntersectionIndex).getX() < points.get(lastIntersectionIndex - 1).getX())
-                    {
-                        //Calculate the intersection between current on previous line
-                        points.set(lastIntersectionIndex - 1, lines.get(lastIntersectionIndex - 2).Intersect(currentLine));
-
-                        //Remove the no longer valid intersection and line
-                        points.remove(lastIntersectionIndex);
-                        lines.remove(lastIntersectionIndex - 1);
-
-                        lastIntersectionIndex--;
-                    }
-
-                    //We add current line to the lines collection
-                    previousLine = currentLine;
-                    lines.add(previousLine);
-                }
-            }
-            //We calculate "theoretical" furthest to right point
-            points.add(new CartesianCoordinates(_rightBorder, previousLine.Evaluate(_rightBorder)));
-            envelope = new Envelope(lines.toArray(new LinearFunction[0]), points.toArray(new CartesianCoordinates[0]));
+        List results = GFG.convexHull(points);
+        double slope, intercept;
+        List upperVertice = new ArrayList<CartesianCoordinates>();
+        for(int i = 0; i < results.size() - 1; i ++){
+            slope = CartesianCoordinates.slope((CartesianCoordinates)results.get(i),(CartesianCoordinates)results.get(i + 1));
+            intercept = CartesianCoordinates.intercept(slope,(CartesianCoordinates)results.get(i + 1));
+            upperVertice.add(new CartesianCoordinates(slope, -intercept));
         }
-        return envelope;
+        upperVertice.forEach(System.out::println);
     }
 }
 
-class  CartesianCoordinates {
+class GFG {
+
+    public static List<CartesianCoordinates> convexHull(List<CartesianCoordinates> p) {
+        if (p.isEmpty()) return null;
+        p.sort(CartesianCoordinates::compareTo);
+        List<CartesianCoordinates> h = new ArrayList<>();
+
+        // lower hull
+        for (CartesianCoordinates pt : p) {
+            while (h.size() >= 2 && !ccw(h.get(h.size() - 2), h.get(h.size() - 1), pt)) {
+                h.remove(h.size() - 1);
+            }
+            h.add(pt);
+        }
+
+        // upper hull
+        int t = h.size() + 1;
+        for (int i = p.size() - 1; i >= 0; i--) {
+            CartesianCoordinates pt = p.get(i);
+            while (h.size() >= t && !ccw(h.get(h.size() - 2), h.get(h.size() - 1), pt)) {
+                h.remove(h.size() - 1);
+            }
+            h.add(pt);
+        }
+//        h.remove(h.size() - 1);
+        return h;
+    }
+
+    // ccw returns true if the three points make a counter-clockwise turn
+    private static boolean ccw(CartesianCoordinates a, CartesianCoordinates b, CartesianCoordinates c) {
+        return ((b.getX() - a.getX()) * (c.getY() - a.getY())) > ((b.getY() - a.getY()) * (c.getX() - a.getX()));
+    }
+}
+
+class  CartesianCoordinates implements Comparable<CartesianCoordinates>{
     double x;
     double y;
     public double getX() {
@@ -170,6 +84,17 @@ class  CartesianCoordinates {
                 "x=" + x +
                 ", y=" + y +
                 '}';
+    }
+
+    @Override
+    public int compareTo(CartesianCoordinates o) {
+        return Double.compare(this.x, o.x);
+    }
+    public static double slope(CartesianCoordinates x, CartesianCoordinates y){
+        return (x.getX() - y.getX()) == 0 ? 0.0 : (x.getY() - y.getY()) / (x.getX() - y.getX()) ;
+    }
+    public static double intercept(double slope, CartesianCoordinates x){
+        return x.getY() - slope * x.getX();
     }
 }
 
