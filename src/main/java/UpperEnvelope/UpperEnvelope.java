@@ -6,8 +6,8 @@ import java.util.List;
 
 public class UpperEnvelope {
     public static void main(String[] args) {
-        double[] A = {1,2,8,4,-1,-2,-1,2};
-        double[] B = {1,4,-1,-6,10,16,20,2};
+        double[] A = {1,2,8,4,-1,-2,-1,2,4,12};
+        double[] B = {1,4,-1,-6,10,16,20,2,15,6};
         List points = new ArrayList<CartesianCoordinates>();
         for(int i = 0; i < A.length; i++){
             points.add(new CartesianCoordinates(A[i], -B[i]));
@@ -25,7 +25,6 @@ public class UpperEnvelope {
 }
 
 class GFG {
-
     public static List<CartesianCoordinates> convexHull(List<CartesianCoordinates> p) {
         if (p.isEmpty()) return null;
         p.sort(CartesianCoordinates::compareTo);
