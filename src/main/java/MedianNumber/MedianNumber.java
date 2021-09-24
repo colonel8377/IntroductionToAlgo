@@ -8,7 +8,7 @@ package MedianNumber;
  */
 public class MedianNumber {
     public static void main(String[] args) {
-        double res = findMedianNumber(new int[]{1, 2, 3, 5, 15}, new int[]{5, 6, 7, 8, 15}, 4);
+        double res = findMedianNumber(new int[]{1, 2, 3, 5, 15}, new int[]{5, 6, 7, 8, 15}, 5);
         System.out.println(res);
     }
     //num1 and nums2 are all in increasing order

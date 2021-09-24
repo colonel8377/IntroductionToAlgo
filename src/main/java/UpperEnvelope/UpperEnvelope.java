@@ -15,7 +15,7 @@ public class UpperEnvelope {
         List results = GFG.convexHull(points);
         double slope, intercept;
         List upperVertice = new ArrayList<CartesianCoordinates>();
-        for(int i = 0; i < results.size() - 1; i ++){
+        for(int i = 0; i < results.size() - 1; i ++) {
             slope = CartesianCoordinates.slope((CartesianCoordinates)results.get(i),(CartesianCoordinates)results.get(i + 1));
             intercept = CartesianCoordinates.intercept(slope,(CartesianCoordinates)results.get(i + 1));
             upperVertice.add(new CartesianCoordinates(slope, -intercept));
@@ -71,6 +71,22 @@ class  CartesianCoordinates implements Comparable<CartesianCoordinates>{
     }
     public void setY(double y) {
         this.y = y;
+    }
+    public CartesianCoordinates add(CartesianCoordinates p){
+        if(p != null){
+            return new CartesianCoordinates(this.x + p.getX(), this.y + p.getY());
+        }
+        else{
+            return this;
+        }
+    }
+    public CartesianCoordinates minus(CartesianCoordinates p){
+        if(p != null){
+            return new CartesianCoordinates(this.x - p.getX(), this.y - p.getY());
+        }
+        else{
+            return this;
+        }
     }
     public CartesianCoordinates(double x, double y) {
         this.x = x;
