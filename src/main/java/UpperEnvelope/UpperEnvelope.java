@@ -3,8 +3,12 @@ package UpperEnvelope;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class UpperEnvelope {
+
     public static void main(String[] args) {
         double[] A = {1,2,8,4,-1,-2,-1,2,4,12};
         double[] B = {1,4,-1,-6,10,16,20,2,15,6};
@@ -24,7 +28,20 @@ public class UpperEnvelope {
     }
 }
 
-class GFG {
+
+class GFG implements Runnable{
+    String name;
+    public static void main(String[] args) {
+        ThreadPoolExecutor threadpool = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
+        for (int i  = 0; i < 100; i ++){
+            threadpool.submit(new GFG("Threads" + i));
+        }
+
+    }
+
+    public GFG(String name){
+        this.name = name;
+    }
     public static List<CartesianCoordinates> convexHull(List<CartesianCoordinates> p) {
         if (p.isEmpty()) return null;
         p.sort(CartesianCoordinates::compareTo);
@@ -54,6 +71,16 @@ class GFG {
     // ccw returns true if the three points make a counter-clockwise turn
     private static boolean ccw(CartesianCoordinates a, CartesianCoordinates b, CartesianCoordinates c) {
         return ((b.getX() - a.getX()) * (c.getY() - a.getY())) > ((b.getY() - a.getY()) * (c.getX() - a.getX()));
+    }
+
+    @Override
+    public void run() {
+        System.out.println("start task " + name);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ignored) {
+        }
+        System.out.println("end task " + name);
     }
 }
 
@@ -168,6 +195,7 @@ class LinearFunction implements Comparable<LinearFunction> {
             return 1;
     }
 }
+
 
 class Envelope {
     public LinearFunction[] lines;

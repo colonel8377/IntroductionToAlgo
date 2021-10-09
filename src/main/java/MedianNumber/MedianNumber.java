@@ -1,5 +1,8 @@
 package MedianNumber;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Java : find median number in two sorted array
  *
@@ -8,8 +11,19 @@ package MedianNumber;
  */
 public class MedianNumber {
     public static void main(String[] args) {
-        double res = findMedianNumber(new int[]{1, 2, 3, 5, 15}, new int[]{5, 6, 7, 8, 15}, 5);
-        System.out.println(res);
+        Map<String, Test> m = new HashMap();
+        m.put("a", new Test(1, 2));
+        m.put("b", new Test(3, 4));
+        Test t = m.get("a");
+        m.remove("a");
+        try {
+            Thread.sleep(1000l);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        System.out.println(t.a);
+
     }
     //num1 and nums2 are all in increasing order
     public static double findMedianNumber(int[] nums1, int[] nums2, int n) {
@@ -18,6 +32,31 @@ public class MedianNumber {
 
     //i: nums1 initial position
     //j: nums2 initial position
+    public static double findMedian(int[] num1, int[] num2, int k){
+        int left = 0;
+        int right = k;
+        int median1 = 0;
+        int median2 = 0;
+        while (left <= right) {
+            int i = (left + right) / 2;
+            int j = (2 * k + 1) / 2 - i;
+            int nums_med1 = (i == 0 ? Integer.MIN_VALUE : num1[i - 1]);
+            int nums_i = (i == k ? Integer.MAX_VALUE : num1[i]);
+            int nums_med2 = (j == 0 ? Integer.MIN_VALUE : num2[j - 1]);
+            int nums_j = (j == k ? Integer.MAX_VALUE : num2[j]);
+
+            if (nums_med1 <= nums_j) {
+                median1 = Math.max(nums_med1, nums_med2);
+                median2 = Math.min(nums_i, nums_j);
+                left = i + 1;
+            } else {
+                right = i - 1;
+            }
+        }
+        return (median1 + median2) / 2.0;
+    }
+
+
     public static int findKth(int[] nums1, int i, int[] nums2, int j, int k){
         if( i >= nums1.length) return nums2[j + k - 1];//nums1 is null
         if( j >= nums2.length) return nums1[i + k - 1];//nums2 is null
@@ -36,5 +75,14 @@ public class MedianNumber {
     }
     public  static int search(int[] nums){
         return -1;
+    }
+}
+
+class Test{
+    int a;
+    int b;
+    Test(int a, int b) {
+        this.a = a;
+        this.b = b;
     }
 }

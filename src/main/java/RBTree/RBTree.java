@@ -3,7 +3,7 @@ package RBTree;
 
 class RBTreeTest {
 
-    private static final int a[] = {4,3,2,7,5,1,9,8,10,6,8};
+    private static final int a[] = {1,2,3,4,5,6,7,8,9,10,11};
     private static final boolean mDebugInsert = false;    // "插入"动作的检测开关(false，关闭；true，打开)
     private static final boolean mDebugDelete = false;    // "删除"动作的检测开关(false，关闭；true，打开)
 
@@ -26,9 +26,6 @@ class RBTreeTest {
                 System.out.printf("\n");
             }
         }
-        tree.remove(7);
-        tree.remove(4);
-        tree.remove(1);
         System.out.printf("== 前序遍历: ");
         tree.preOrder();
 
